@@ -47,7 +47,28 @@ function translate(){
 }
 document.getElementById('translate').onclick=translate;
 document.getElementById('clear').onclick=()=>{source.value='';result.textContent='Your translation will appear here.';source.focus()};
-document.getElementById('speak').onclick=()=>{if(!('speechSynthesis'in window)){alert('Text-to-speech is not supported in this browser.');return}const u=new SpeechSynthesisUtterance(result.textContent);u.lang='fil-PH';speechSynthesis.speak(u)};
+
+document.getElementById('speak').onclick = () => {
+    const text = document.getElementById('result').textContent.trim();
+
+    // Send translated text to MIT App Inventor
+    if (window.AppInventor &&
+        typeof window.AppInventor.setWebViewString === 'function') {
+
+        window.AppInventor.setWebViewString(text);
+
+    } else if ('speechSynthesis' in window) {
+
+        // Fallback for normal browsers
+        window.speechSynthesis.cancel();
+
+        const speech = new SpeechSynthesisUtterance(text);
+        speech.lang = 'fil-PH';
+        speech.rate = 0.85;
+
+        window.speechSynthesis.speak(speech);
+    }
+};
 document.getElementById('copy').onclick=async()=>{try{await navigator.clipboard.writeText(result.textContent);document.getElementById('copy').textContent='✓';setTimeout(()=>document.getElementById('copy').textContent='▣',1000)}catch(e){alert('Copy is unavailable. Please select the result text.')}};
 const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
 document.getElementById('mic').onclick=()=>{
